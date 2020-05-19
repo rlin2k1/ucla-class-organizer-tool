@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+
 import { Class } from '../class'
-import { CLASSES} from '../mock-classes';
+import { ClassService } from '../class.service';
+import { MessageService } from '../message.service';
 
 @Component({
   selector: 'app-class',
@@ -9,15 +11,21 @@ import { CLASSES} from '../mock-classes';
 })
 export class ClassComponent implements OnInit {
 
-  classes = CLASSES;
+  classes: Class[];
   selectedClass: Class;
 
-  constructor() { }
+  constructor(private classService: ClassService, private messageService: MessageService) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
+    this.getClasses();
   }
 
-  onSelect(course: Class): void {
-    this.selectedClass = course;
+  getClasses(): void {
+    this.classService.getClasses().subscribe(classes => this.classes = classes);
+  }
+
+  onSelect(class_: Class): void {
+    this.selectedClass = class_;
+    this.messageService.add(`ClassService: Selected class id=${class_.id}`);
   }
 }
