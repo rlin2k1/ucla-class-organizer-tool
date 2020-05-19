@@ -6,12 +6,4 @@
   </li>
 </ul>
 
-<div *ngIf="selectedClass">
-    <h2>{{selectedClass.name | uppercase}} Details</h2>
-    <div><span>id: </span>{{selectedClass.id}}</div>
-    <div>
-    <label>name:
-        <input [(ngModel)]="selectedClass.name" placeholder="selectedClass.name"/>
-    </label>
-    </div>
-</div>
+<app-class-detail [class]="selectedClass"></app-class-detail>
