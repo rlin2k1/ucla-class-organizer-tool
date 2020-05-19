@@ -12,9 +12,8 @@ import { MessageService } from '../message.service';
 export class ClassComponent implements OnInit {
 
   classes: Class[];
-  selectedClass: Class;
 
-  constructor(private classService: ClassService, private messageService: MessageService) {}
+  constructor(private classService: ClassService) {}
 
   ngOnInit() {
     this.getClasses();
@@ -22,10 +21,5 @@ export class ClassComponent implements OnInit {
 
   getClasses(): void {
     this.classService.getClasses().subscribe(classes => this.classes = classes);
-  }
-
-  onSelect(class_: Class): void {
-    this.selectedClass = class_;
-    this.messageService.add(`ClassService: Selected class id=${class_.id}`);
   }
 }
