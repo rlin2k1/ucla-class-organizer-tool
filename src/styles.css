@@ -16,6 +16,7 @@ h1 {
   body, input[type="text"], button {
     color: #333;
     font-family: Cambria, Georgia;
+    width: 50em;
   }
   /* everywhere else */
   * {
