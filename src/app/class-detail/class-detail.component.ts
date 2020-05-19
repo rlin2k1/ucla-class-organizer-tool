@@ -34,4 +34,9 @@ export class ClassDetailComponent implements OnInit {
     this.location.back();
   }
 
+  save(): void {
+    this.classService.updateClass(this.class)
+      .subscribe(() => this.goBack());
+  }
+
 }

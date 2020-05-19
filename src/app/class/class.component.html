@@ -1,9 +1,20 @@
 <h2>My Classes</h2>
 
+<div>
+  <label>Class name:
+    <input #className />
+  </label>
+  <!-- (click) passes input value to add() and then clears the input -->
+  <button (click)="add(className.value); className.value=''">
+    add
+  </button>
+</div>
 <ul class="classes">
   <li *ngFor="let class of classes">
   <a routerLink="/detail/{{class.id}}">
     <span class="badge">{{class.id}}</span> {{class.name}}
   </a>
+  <button class="delete" title="delete class"
+  (click)="delete(class)">x</button>
   </li>
 </ul>

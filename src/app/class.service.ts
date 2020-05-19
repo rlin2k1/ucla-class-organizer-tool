@@ -1,24 +1,92 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 
 import { Class } from './class';
-import { CLASSES } from './mock-classes';
 import { MessageService } from './message.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClassService {
 
-  constructor(private messageService: MessageService) { }
+  private classesUrl = 'api/classes';  // URL to web api
+
+  httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
+
+  constructor(
+    private http: HttpClient,
+    private messageService: MessageService) { }
 
   getClasses(): Observable<Class[]> {
-    this.messageService.add('ClassService: fetched classes');
-    return of(CLASSES);
+    return this.http.get<Class[]>(this.classesUrl)
+      .pipe(
+        tap(_ => this.log('fetched classes')),
+        catchError(this.handleError<Class[]>('getClasses', []))
+      );
   }
 
+  /** GET class by id. Will 404 if id not found */
   getClass(id: number): Observable<Class> {
-    this.messageService.add(`ClassService: fetched class id=${id}`);
-    return of(CLASSES.find(class_ => class_.id === id));
+    const url = `${this.classesUrl}/${id}`;
+    return this.http.get<Class>(url).pipe(
+      tap(_ => this.log(`fetched class id=${id}`)),
+      catchError(this.handleError<Class>(`getClass id=${id}`))
+    );
+  }
+
+  /** PUT: update the class on the server */
+  updateClass(class_: Class): Observable<any> {
+    return this.http.put(this.classesUrl, class_, this.httpOptions).pipe(
+      tap(_ => this.log(`updated class id=${class_.id}`)),
+      catchError(this.handleError<any>('updateClass'))
+    );
+  }
+
+  /** POST: add a new class to the server */
+  addClass(class_: Class): Observable<Class> {
+    return this.http.post<Class>(this.classesUrl, class_, this.httpOptions).pipe(
+      tap((newClass: Class) => this.log(`added class w/ id=${newClass.id}`)),
+      catchError(this.handleError<Class>('addClass'))
+    );
+  }
+
+  /** DELETE: delete the class from the server */
+  deleteClass(class_: Class | number): Observable<Class> {
+    const id = typeof class_ === 'number' ? class_ : class_.id;
+    const url = `${this.classesUrl}/${id}`;
+
+    return this.http.delete<Class>(url, this.httpOptions).pipe(
+      tap(_ => this.log(`deleted class id=${id}`)),
+      catchError(this.handleError<Class>('deleteClass'))
+    );
+  }
+
+  /** Log a ClassService message with the MessageService */
+  private log(message: string) {
+    this.messageService.add(`ClassService: ${message}`);
+  }
+
+  /**
+   * Handle Http operation that failed.
+   * Let the app continue.
+   * @param operation - name of the operation that failed
+   * @param result - optional value to return as the observable result
+   */
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+
+      // TODO: send the error to remote logging infrastructure
+      console.error(error); // log to console instead
+
+      // TODO: better job of transforming error for user consumption
+      this.log(`${operation} failed: ${error.message}`);
+
+      // Let the app keep running by returning an empty result.
+      return of(result as T);
+    };
   }
 }

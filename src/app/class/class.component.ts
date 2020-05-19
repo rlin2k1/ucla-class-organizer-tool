@@ -22,4 +22,18 @@ export class ClassComponent implements OnInit {
   getClasses(): void {
     this.classService.getClasses().subscribe(classes => this.classes = classes);
   }
+
+  add(name: string): void {
+    name = name.trim();
+    if (!name) { return; }
+    this.classService.addClass({ name } as Class)
+      .subscribe(class_ => {
+        this.classes.push(class_);
+      });
+  }
+
+  delete(class_: Class): void {
+    this.classes = this.classes.filter(h => h !== class_);
+    this.classService.deleteClass(class_).subscribe();
+  }
 }
