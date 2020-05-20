@@ -65,6 +65,20 @@ export class ClassService {
     );
   }
 
+  /* GET classes whose name contains search term */
+  searchClasses(term: string): Observable<Class[]> {
+    if (!term.trim()) {
+      // if not search term, return empty class array.
+      return of([]);
+    }
+    return this.http.get<Class[]>(`${this.classesUrl}/?name=${term}`).pipe(
+      tap(x => x.length ?
+        this.log(`found classes matching "${term}"`) :
+        this.log(`no classes matching "${term}"`)),
+      catchError(this.handleError<Class[]>('searchClasses', []))
+    );
+  }
+
   /** Log a ClassService message with the MessageService */
   private log(message: string) {
     this.messageService.add(`ClassService: ${message}`);
